@@ -1,8 +1,10 @@
 import os
+from pathlib import Path
 
 import uvicorn
 from authlib.integrations.starlette_client import OAuth
 from authlib.integrations.starlette_client import OAuthError
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi import Request
 from starlette.config import Config
@@ -10,12 +12,15 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.responses import HTMLResponse
 from starlette.responses import RedirectResponse
 
+env_path = Path('.') / '.env'
+load_dotenv(dotenv_path=env_path)
+
 # Create the APP
 app = FastAPI()
 
 # OAuth settings
-GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID') or None
-GOOGLE_CLIENT_SECRET = os.environ.get('GOOGLE_CLIENT_SECRET') or None
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID') or None
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET') or None
 if GOOGLE_CLIENT_ID is None or GOOGLE_CLIENT_SECRET is None:
     raise BaseException('Missing env variables')
 
@@ -30,7 +35,7 @@ oauth.register(
 )
 
 # Set up the middleware to read the request session
-SECRET_KEY = os.environ.get('SECRET_KEY') or None
+SECRET_KEY = os.getenv('SECRET_KEY') or None
 if SECRET_KEY is None:
     raise 'Missing SECRET_KEY'
 app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
